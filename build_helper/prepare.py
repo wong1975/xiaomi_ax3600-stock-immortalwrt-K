@@ -160,8 +160,8 @@ def prepare(configs: dict[str, dict[str, Any]]) -> None:
     #logger.info(f"仓库环境变量: {os.getenv('OPENWRT_REPO')}")
 
     # 设置克隆路径
-    #openwrt_paths = os.path.join(paths.workdir, "openwrts")
-    #cfg_names = list(configs.keys())
+    openwrt_paths = os.path.join(paths.workdir, "openwrts")
+    cfg_names = list(configs.keys())
 
     #pygit2.clone_repository(openwrt_repo, os.path.join(openwrt_paths, cfg_names[0]))
 
