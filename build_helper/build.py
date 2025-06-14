@@ -307,8 +307,8 @@ def build_image_builder(cfg: dict) -> None:
     if not files:
         folder_path = os.path.join(openwrt.path, "bin", "targets", target, subtarget)
         folder_files = os.listdir(folder_path)  # 获取文件夹下的所有文件
-        print(f"未找到匹配的 ImageBuilder 文件，当前目录包含：\n{folder_files}")  # 输出文件列表
-        raise FileNotFoundError("没有找到匹配的 ImageBuilder 文件，请检查路径或文件是否存在")
+        logger.debug(f"未找到匹配的 ImageBuilder 文件，当前目录包含：\n{folder_files}")  # 输出文件列表
+        #raise FileNotFoundError("没有找到匹配的 ImageBuilder 文件，请检查路径或文件是否存在")
 
     else:
         # 选择第一个匹配的文件
