@@ -244,62 +244,60 @@ def build_image_builder(cfg: dict) -> None:
         msg = "无法获取target信息"
         raise RuntimeError(msg)
 
-    # 定义需要上传的文件列表
-    files_to_upload = [
-        "immortalwrt-qualcommax-ipq807x-xiaomi_ax3600-stock-squashfs-factory.ubi",
-        "immortalwrt-qualcommax-ipq807x-xiaomi_ax3600-stock-squashfs-sysupgrade.bin"
-        "immortalwrt-qualcommax-ipq807x-xiaomi_ax3600-squashfs-factory.ubi",
-        "immortalwrt-qualcommax-ipq807x-xiaomi_ax3600-squashfs-sysupgrade.bin"
-        "openwrt-qualcommax-ipq807x-xiaomi_ax3600-stock-squashfs-factory.ubi",
-        "openwrt-qualcommax-ipq807x-xiaomi_ax3600-stock-squashfs-sysupgrade.bin"
-        "openwrt-qualcommax-ipq807x-xiaomi_ax3600-squashfs-factory.ubi",
-        "openwrt-qualcommax-ipq807x-xiaomi_ax3600-squashfs-sysupgrade.bin"
-    ]
+
+    # 设定目标路径
+    target_dir = os.path.join(openwrt.path, "bin", "targets", target, subtarget)
+
+    # 获取所有 .ubi 和 .bin 文件
+    files_to_upload = [f for f in os.listdir(target_dir) if f.endswith((".ubi", ".bin"))]
 
     # 遍历文件并上传
+    if not files_to_upload:
+        logger.error("未找到符合条件的固件文件 (.ubi 或 .bin)")
+        exit(1)
+
     for filename in files_to_upload:
-        file_path = os.path.join(openwrt.path, "bin", "targets", target, subtarget, filename)
+        file_path = os.path.join(target_dir, filename)
     
         if os.path.exists(file_path):
             uploader.add(f"Image_Builder-{cfg['name']}", file_path, retention_days=1, compression_level=0)
+            logger.info(f"成功上传文件: {filename}")
         else:
             logger.error(f"文件不存在: {file_path}")
 
 
-    # 定义可能的路径
-    image_builder_files = [
-        f"openwrt-imagebuilder-{target}-{subtarget}.Linux-x86_64.tar.zst",
-        f"openwrt-imagebuilder-{target}-{subtarget}.Linux-x86_64.tar.xz",
-        "immortalwrt-imagebuilder-qualcommax-ipq807x.Linux-x86_64.tar.zst",
-        "immortalwrt-imagebuilder-qualcommax-ipq807x.Linux-x86_64.tar.xz"
-    ]
+    # 设定目标路径
+    target_dir = os.path.join(openwrt.path, "bin", "targets", target, subtarget)
 
-    # 遍历路径，寻找存在的文件
-    bl_path = None
-    ext = None
-    for filename in image_builder_files:
-        path = os.path.join(openwrt.path, "bin", "targets", target, subtarget, filename)
-        if os.path.exists(path):
-            bl_path = path
-            ext = filename.split(".")[-1]
-            break  # 找到匹配的文件后立即退出循环
+    # 正则匹配 "imagebuilder" 且以 "Linux-x86_64.tar.zst" 结尾的文件
+    pattern = re.compile(r".*imagebuilder.*Linux-x86_64\.tar\.zst$")
+    image_builder_files = [f for f in os.listdir(target_dir) if pattern.match(f)]
 
-    if not bl_path:
-        logger.error("未找到合适的 Image Builder 文件")
+    # 找到符合条件的文件
+    if not image_builder_files:
+        logger.error("未找到符合条件的 Image Builder 文件")
         exit(1)
 
-    # 移动文件
-    upload_path = os.path.join(paths.uploads, f"openwrt-imagebuilder.tar.{ext}")
-    shutil.move(bl_path, upload_path)
-    bl_path = upload_path
+    # 选择第一个符合条件的文件
+    bl_path = os.path.join(target_dir, image_builder_files[0])
+    ext = "zst"
+
+    # 移动文件到 uploads 目录
+    upload_path = os.path.join(paths.uploads, os.path.basename(bl_path))
+    try:
+        shutil.move(bl_path, upload_path)
+        bl_path = upload_path
+        logger.info(f"文件已移动至: {upload_path}")
+    except Exception as e:
+        logger.error(f"文件移动失败: {e}")
+        exit(1)
 
     # 添加到上传
-    #uploader.add(f"Image_Builder-{cfg['name']}", bl_path, retention_days=1, compression_level=0)
+    uploader.add(f"Image_Builder-{cfg['name']}", bl_path, retention_days=1, compression_level=0)
 
     # 清理缓存
     logger.info("删除旧缓存...")
     del_cache(get_cache_restore_key(openwrt, cfg))
-
 
 def build_images(cfg: dict) -> None:
     ib = ImageBuilder(os.path.join(paths.workdir, "ImageBuilder"))
