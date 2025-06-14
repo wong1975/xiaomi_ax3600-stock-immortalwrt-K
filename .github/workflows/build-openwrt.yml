@@ -20,8 +20,10 @@ permissions:
   contents: write
   discussions: write
 env:
-  GITHUB_TOKEN: ${{ github.token }}
+  #GITHUB_TOKEN: ${{ github.token }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} #使用 secrets.GITHUB_TOKEN 代替 github.token，因为 GitHub 的 token 是 一个机密值，应存储在 secrets 里
   BUILD_HELPER_DEBUG: true
+  OPENWRT_REPO: "https://github.com/${{ inputs.repo }}"
 jobs:
 
   prepare:
