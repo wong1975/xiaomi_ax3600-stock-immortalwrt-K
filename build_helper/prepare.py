@@ -153,6 +153,7 @@ def prepare(configs: dict[str, dict[str, Any]]) -> None:
     #pygit2.clone_repository("https://github.com/immortalwrt/immortalwrt", os.path.join(openwrt_paths, cfg_names[0]))
     # 获取仓库地址
     openwrt_repo = os.getenv("OPENWRT_REPO", "https://github.com/openwrt/openwrt")  # 默认 OpenWrt
+    logger.info(f"仓库环境变量: {os.getenv('OPENWRT_REPO')}")
 
     # 设置克隆路径
     openwrt_paths = os.path.join(paths.workdir, "openwrts")
