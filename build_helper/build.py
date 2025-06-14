@@ -244,17 +244,62 @@ def build_image_builder(cfg: dict) -> None:
         msg = "无法获取target信息"
         raise RuntimeError(msg)
 
-    bl_path = os.path.join(openwrt.path, "bin", "targets", target, subtarget, f"openwrt-imagebuilder-{target}-{subtarget}.Linux-x86_64.tar.zst")
-    ext = "zst"
-    if not os.path.exists(bl_path):
-        bl_path = os.path.join(openwrt.path, "bin", "targets", target, subtarget, f"openwrt-imagebuilder-{target}-{subtarget}.Linux-x86_64.tar.xz")
-        ext = "xz"
-    shutil.move(bl_path, os.path.join(paths.uploads, f"openwrt-imagebuilder.tar.{ext}"))
-    bl_path = os.path.join(paths.uploads, f"openwrt-imagebuilder.tar.{ext}")
-    uploader.add(f"Image_Builder-{cfg['name']}", bl_path, retention_days=1, compression_level=0)
+    # 定义需要上传的文件列表
+    files_to_upload = [
+        "immortalwrt-qualcommax-ipq807x-xiaomi_ax3600-stock-squashfs-factory.ubi",
+        "immortalwrt-qualcommax-ipq807x-xiaomi_ax3600-stock-squashfs-sysupgrade.bin"
+        "immortalwrt-qualcommax-ipq807x-xiaomi_ax3600-squashfs-factory.ubi",
+        "immortalwrt-qualcommax-ipq807x-xiaomi_ax3600-squashfs-sysupgrade.bin"
+        "openwrt-qualcommax-ipq807x-xiaomi_ax3600-stock-squashfs-factory.ubi",
+        "openwrt-qualcommax-ipq807x-xiaomi_ax3600-stock-squashfs-sysupgrade.bin"
+        "openwrt-qualcommax-ipq807x-xiaomi_ax3600-squashfs-factory.ubi",
+        "openwrt-qualcommax-ipq807x-xiaomi_ax3600-squashfs-sysupgrade.bin"
+    ]
 
+    # 遍历文件并上传
+    for filename in files_to_upload:
+        file_path = os.path.join(openwrt.path, "bin", "targets", target, subtarget, filename)
+    
+        if os.path.exists(file_path):
+            uploader.add(f"Image_Builder-{cfg['name']}", file_path, retention_days=1, compression_level=0)
+        else:
+            logger.error(f"文件不存在: {file_path}")
+
+
+    # 定义可能的路径
+    image_builder_files = [
+        f"openwrt-imagebuilder-{target}-{subtarget}.Linux-x86_64.tar.zst",
+        f"openwrt-imagebuilder-{target}-{subtarget}.Linux-x86_64.tar.xz",
+        "immortalwrt-imagebuilder-qualcommax-ipq807x.Linux-x86_64.tar.zst",
+        "immortalwrt-imagebuilder-qualcommax-ipq807x.Linux-x86_64.tar.xz"
+    ]
+
+    # 遍历路径，寻找存在的文件
+    bl_path = None
+    ext = None
+    for filename in image_builder_files:
+        path = os.path.join(openwrt.path, "bin", "targets", target, subtarget, filename)
+        if os.path.exists(path):
+            bl_path = path
+            ext = filename.split(".")[-1]
+            break  # 找到匹配的文件后立即退出循环
+
+    if not bl_path:
+        logger.error("未找到合适的 Image Builder 文件")
+        exit(1)
+
+    # 移动文件
+    upload_path = os.path.join(paths.uploads, f"openwrt-imagebuilder.tar.{ext}")
+    shutil.move(bl_path, upload_path)
+    bl_path = upload_path
+
+    # 添加到上传
+    #uploader.add(f"Image_Builder-{cfg['name']}", bl_path, retention_days=1, compression_level=0)
+
+    # 清理缓存
     logger.info("删除旧缓存...")
     del_cache(get_cache_restore_key(openwrt, cfg))
+
 
 def build_images(cfg: dict) -> None:
     ib = ImageBuilder(os.path.join(paths.workdir, "ImageBuilder"))
