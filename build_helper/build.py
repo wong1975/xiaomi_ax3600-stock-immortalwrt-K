@@ -300,34 +300,24 @@ def build_image_builder(cfg: dict) -> None:
     else:
         logger.warning(f"ipq807x 目录不存在: {ipq807x_path}")
     
-    # 设定目标路径
-    target_dir = os.path.join(openwrt.path, "bin", "targets", target, subtarget)
+    # 匹配 ImageBuilder 文件
+    bl_path_pattern = os.path.join(openwrt.path, "bin", "targets", target, subtarget, "*-imagebuilder-*-" + f"{target}-{subtarget}.Linux-x86_64.tar.*")
 
-    # 正则匹配 "imagebuilder" 且以 "Linux-x86_64.tar.zst" 结尾的文件
-    pattern = re.compile(r".*imagebuilder.*Linux-x86_64.tar.zst$")
-    image_builder_files = [f for f in os.listdir(target_dir) if pattern.match(f)]
+    files = glob.glob(bl_path_pattern)
 
-    # 找到符合条件的文件
-    if not image_builder_files:
-        logger.error("未找到符合条件的 Image Builder 文件")
-        exit(1)
+    if not files:
+    raise FileNotFoundError("没有找到匹配的 ImageBuilder 文件")
 
-    # 选择第一个符合条件的文件
-    bl_path = os.path.join(target_dir, image_builder_files[0])
-    ext = "zst"
+    # 选择第一个匹配的文件
+    bl_path = files[0]
+    ext = bl_path.split(".")[-1]  # 自动获取扩展名
 
-    # 移动文件到 uploads 目录
-    upload_path = os.path.join(paths.uploads, os.path.basename(bl_path))
-    try:
-        shutil.move(bl_path, upload_path)
-        bl_path = upload_path
-        logger.info(f"文件已移动至: {upload_path}")
-    except Exception as e:
-        logger.error(f"文件移动失败: {e}")
-        exit(1)
+    # 移动文件
+    dest_path = os.path.join(paths.uploads, f"openwrt-imagebuilder.tar.{ext}")
+    shutil.move(bl_path, dest_path)
 
-    # 添加到上传
-    uploader.add(f"Image_Builder-{cfg['name']}", bl_path, retention_days=1, compression_level=0)
+    # 上传文件
+    uploader.add(f"Image_Builder-{cfg['name']}", dest_path, retention_days=1, compression_level=0)
 
     # 清理缓存
     logger.info("删除旧缓存...")
