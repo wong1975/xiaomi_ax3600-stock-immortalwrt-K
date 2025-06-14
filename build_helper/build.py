@@ -302,20 +302,15 @@ def build_image_builder(cfg: dict) -> None:
     
     # 匹配 ImageBuilder 文件
     bl_path_pattern = os.path.join(openwrt.path, "bin", "targets", target, subtarget, "*-imagebuilder-*-" + f"{target}-{subtarget}.Linux-x86_64.tar.*")
-
     files = glob.glob(bl_path_pattern)
-
     if not files:
-    raise FileNotFoundError("没有找到匹配的 ImageBuilder 文件")
-
+        raise FileNotFoundError("没有找到匹配的 ImageBuilder 文件")
     # 选择第一个匹配的文件
     bl_path = files[0]
     ext = bl_path.split(".")[-1]  # 自动获取扩展名
-
     # 移动文件
     dest_path = os.path.join(paths.uploads, f"openwrt-imagebuilder.tar.{ext}")
     shutil.move(bl_path, dest_path)
-
     # 上传文件
     uploader.add(f"Image_Builder-{cfg['name']}", dest_path, retention_days=1, compression_level=0)
 
