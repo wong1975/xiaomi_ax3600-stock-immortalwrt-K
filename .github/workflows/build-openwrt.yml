@@ -4,6 +4,15 @@
 name: Build OpenWrt-K
 on:
   workflow_dispatch:
+    inputs:
+      repo:
+        description: '选择仓库'
+        required: true
+        default: 'immortalwrt/immortalwrt'
+        type: choice
+        options:
+          - 'openwrt/openwrt'
+          - 'immortalwrt/immortalwrt'
 
 
 permissions:
