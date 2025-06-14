@@ -301,18 +301,27 @@ def build_image_builder(cfg: dict) -> None:
         logger.warning(f"ipq807x 目录不存在: {ipq807x_path}")
     
     # 匹配 ImageBuilder 文件
-    bl_path_pattern = os.path.join(openwrt.path, "bin", "targets", target, subtarget, "*-imagebuilder-*-" + f"{target}-{subtarget}.Linux-x86_64.tar.*")
+    bl_path_pattern = os.path.join(openwrt.path, "bin", "targets", target, subtarget, f"*-imagebuilder-*-{target}-{subtarget}.Linux-x86_64.tar.*")
     files = glob.glob(bl_path_pattern)
+
     if not files:
-        raise FileNotFoundError("没有找到匹配的 ImageBuilder 文件")
-    # 选择第一个匹配的文件
-    bl_path = files[0]
-    ext = bl_path.split(".")[-1]  # 自动获取扩展名
-    # 移动文件
-    dest_path = os.path.join(paths.uploads, f"openwrt-imagebuilder.tar.{ext}")
-    shutil.move(bl_path, dest_path)
-    # 上传文件
-    uploader.add(f"Image_Builder-{cfg['name']}", dest_path, retention_days=1, compression_level=0)
+        folder_path = os.path.join(openwrt.path, "bin", "targets", target, subtarget)
+        folder_files = os.listdir(folder_path)  # 获取文件夹下的所有文件
+        print(f"未找到匹配的 ImageBuilder 文件，当前目录包含：\n{folder_files}")  # 输出文件列表
+        raise FileNotFoundError("没有找到匹配的 ImageBuilder 文件，请检查路径或文件是否存在")
+
+    else:
+        # 选择第一个匹配的文件
+        bl_path = files[0]
+        ext = bl_path.split(".")[-1]  # 自动获取扩展名
+
+        # 移动文件
+        dest_path = os.path.join(paths.uploads, f"openwrt-imagebuilder.tar.{ext}")
+        shutil.move(bl_path, dest_path)
+
+        # 上传文件
+        uploader.add(f"Image_Builder-{cfg['name']}", dest_path, retention_days=1, compression_level=0)
+
 
     # 清理缓存
     logger.info("删除旧缓存...")
