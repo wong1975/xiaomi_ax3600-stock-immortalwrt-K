@@ -145,7 +145,6 @@ def prepare(configs: dict[str, dict[str, Any]]) -> None:
                     elif not os.path.isdir(zh_hans) or not os.path.islink(zh_hans):
                         logger.info("%s 中不存在汉化文件，这可能是该luci插件原生为中文或不支持中文", po_path)
 
-def prepare(configs):
     global openwrt_repo  # 显示声明为全局变量
     openwrt_repo = os.getenv("OPENWRT_REPO", "https://github.com/openwrt/openwrt")
     logger.info(f"开始克隆仓库源码...: {openwrt_repo}")
