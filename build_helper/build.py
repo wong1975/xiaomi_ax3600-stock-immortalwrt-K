@@ -274,21 +274,26 @@ def build_image_builder(cfg: dict) -> None:
     bin_files = os.listdir(bin_path)
     logger.debug(f"bin 目录下的文件: {bin_files}")   #有['targets', 'packages']
 
-    # 列出 targets 目录下的所有文件
+    # 列出 targets 目录下的所有文件 有targets 目录下的文件: ['qualcommax']
     if os.path.exists(targets_path):
         target_files = os.listdir(targets_path)
-        logger.debug(f"targets 目录下的文件: {target_files}")#有['packages', 'immortalwrt-qualcommax-ipq807x-xiaomi_ax3600-stock-initramfs-uImage.itb', 'immortalwrt-qualcommax-ipq807x-xiaomi_ax3600-stock-squashfs-factory.ubi', 'immortalwrt-qualcommax-ipq807x-xiaomi_ax3600-stock-squashfs-sysupgrade.bin', 'immortalwrt-qualcommax-ipq807x-xiaomi_ax3600-stock.manifest', 'immortalwrt-imagebuilder-qualcommax-ipq807x.Linux-x86_64.tar.zst', 'profiles.json', 'sha256sums']
+        logger.debug(f"targets 目录下的文件: {target_files}") #有['packages', 'immortalwrt-qualcommax-ipq807x-xiaomi_ax3600-stock-initramfs-uImage.itb', 'immortalwrt-qualcommax-ipq807x-xiaomi_ax3600-stock-squashfs-factory.ubi', 'immortalwrt-qualcommax-ipq807x-xiaomi_ax3600-stock-squashfs-sysupgrade.bin', 'immortalwrt-qualcommax-ipq807x-xiaomi_ax3600-stock.manifest', 'immortalwrt-imagebuilder-qualcommax-ipq807x.Linux-x86_64.tar.zst', 'profiles.json', 'sha256sums']
     else:
         logger.warning(f"targets 目录不存在: {targets_path}")
 
-    # 列出 qualcommax 目录下的所有文件
+    # 列出 qualcommax 目录下的所有文件  qualcommax 目录下的文件: ['ipq807x']
     if os.path.exists(qualcomm_path):
         qualcomm_files = os.listdir(qualcomm_path)
         logger.debug(f"qualcommax 目录下的文件: {qualcomm_files}")
     else:
         logger.warning(f"qualcommax 目录不存在: {qualcomm_path}")
 
-    # 列出 ipq807x 目录下的所有文件
+    # 列出 ipq807x 目录下的所有文件 ipq807x 目录下的文件: 
+    #['packages', 
+    #'immortalwrt-qualcommax-ipq807x-xiaomi_ax3600-stock-initramfs-uImage.itb', 
+    #'immortalwrt-qualcommax-ipq807x-xiaomi_ax3600-stock.manifest', 
+    #'immortalwrt-imagebuilder-qualcommax-ipq807x.Linux-x86_64.tar.zst', 
+    #'profiles.json', 'sha256sums']
     if os.path.exists(ipq807x_path):
         ipq807x_files = os.listdir(ipq807x_path)
         logger.debug(f"ipq807x 目录下的文件: {ipq807x_files}")
@@ -296,10 +301,10 @@ def build_image_builder(cfg: dict) -> None:
         logger.warning(f"ipq807x 目录不存在: {ipq807x_path}")
     
     # 设定目标路径
-    target_dir = os.path.join(openwrt.path, "bin", "targets")
+    target_dir = os.path.join(openwrt.path, "bin", "targets", target, subtarget)
 
     # 正则匹配 "imagebuilder" 且以 "Linux-x86_64.tar.zst" 结尾的文件
-    pattern = re.compile(r".*imagebuilder.*Linux-x86_64\.tar\.zst$")
+    pattern = re.compile(r".*imagebuilder.*Linux-x86_64.tar.zst$")
     image_builder_files = [f for f in os.listdir(target_dir) if pattern.match(f)]
 
     # 找到符合条件的文件
