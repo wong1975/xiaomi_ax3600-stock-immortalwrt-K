@@ -201,7 +201,7 @@ def build_image_builder(cfg: dict) -> None:
                 (match := re.match(r"CONFIG_TARGET_ROOTFS_(?P<name>[^_=]+)=y", line)) or
                 (match := re.match(r"CONFIG_TARGET_IMAGES_(?P<name>[^_=]+)=y", line))):
                 name = match.group("name")
-                if name in ("ISO", "VDI", "VMDK", "VHDX", "TARGZ", "CPIOGZ", "EXT4FS", "SQUASHFS", "GZIP"):
+                if name in ("ISO", "VDI", "VMDK", "VHDX", "TARGZ", "CPIOGZ", "EXT4FS", "SQUASHFS", "GZIP"):   # 移除 SQUASHFS
                     logger.debug(f"不构建 {name} 格式镜像")
                     f.write(line.replace("=y", "=n") + "\n")
             else:
