@@ -266,9 +266,9 @@ def build_image_builder(cfg: dict) -> None:
     #        logger.error(f"文件不存在: {file_path}")
 
     bin_path = os.path.join(openwrt.path, "bin")
-    targets_path = os.path.join(bin_path, "targets", target, subtarget)
-    qualcomm_path = os.path.join(targets_path, "qualcommax")
-    ipq807x_path = os.path.join(qualcomm_path, "ipq807x")
+    targets_path = os.path.join(bin_path, "targets")#, target, subtarget
+    qualcomm_path = os.path.join(targets_path, target)#"qualcommax"
+    ipq807x_path = os.path.join(qualcomm_path, subtarget)#"ipq807x"
 
     # 列出 bin 目录下的所有文件
     bin_files = os.listdir(bin_path)
@@ -296,7 +296,7 @@ def build_image_builder(cfg: dict) -> None:
         logger.warning(f"ipq807x 目录不存在: {ipq807x_path}")
     
     # 设定目标路径
-    target_dir = os.path.join(openwrt.path, "bin", "targets", target, subtarget)
+    target_dir = os.path.join(openwrt.path, "bin", "targets")
 
     # 正则匹配 "imagebuilder" 且以 "Linux-x86_64.tar.zst" 结尾的文件
     pattern = re.compile(r".*imagebuilder.*Linux-x86_64\.tar\.zst$")
