@@ -97,8 +97,8 @@ def prepare(configs: dict[str, dict[str, Any]]) -> None:
                                        ("https://github.com/chenmozhijin/turboacc", "package"),
                                        ("https://github.com/pymumu/openwrt-smartdns", "master"),
                                        ("https://github.com/pymumu/luci-app-smartdns", "master"),
-                                       ("https://github.com/QiuSimons/openwrt-mos/tree/master/mosdns", "master"),
-                                       ("https://github.com/QiuSimons/openwrt-mos/tree/master/luci-app-mosdns", "master"),
+                                       #("https://github.com/sbwml/luci-app-mosdns", "master"),
+                                       #("https://github.com/QiuSimons/openwrt-mos/tree/master/luci-app-mosdns", "master"),
                                        *[(pkg["REPOSITORIE"], pkg["BRANCH"]) for config in configs.values() for pkg in config["extpackages"].values()],
                                        *[("https://github.com/sbwml/packages_lang_golang",
                                           config["openwrtext"]["golang_version"]) for config in configs.values()]}
