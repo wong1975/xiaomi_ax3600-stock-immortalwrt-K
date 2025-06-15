@@ -87,7 +87,7 @@ def setup_env(full: bool = False, clear: bool = False) -> None:
     apt("clean")
     # 8.调整时区
     logger.info("调整时区")
-    sudo("timedatectl", "set-timezone", "Asia/Shanghai")
+    sudo("timedatectl", "set-timezone", "Asia/Hong Kong")
     if clear:
         # 清理空间
         logger.info("清理空间")
