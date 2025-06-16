@@ -432,6 +432,17 @@ def prepare_cfg(config: dict[str, Any],
             else:
                 f.write(line + "\n")
 
+    # 请求 DHCP 时不发送主机名
+    with open(os.path.join(files_path, "etc", "uci-defaults", "zzz-chenmozhijin"), "a", encoding="utf-8") as f:
+        f.write("uci set network.wwan.hostname='*'\n")
+
+    # 取消 DHCP 重绑定保护
+    with open(os.path.join(files_path, "etc", "uci-defaults", "zzz-chenmozhijin"), "a", encoding="utf-8") as f:
+        f.write("uci set dhcp.cfg01411c.rebind_protection='0'\n")
+
+    logger.info("已添加 DHCP 不发送主机名和取消重绑定保护设置")
+
+    
     logger.info("%s其他处理", cfg_name)
     with open(os.path.join(openwrt.path, "package", "base-files", "files", "bin", "config_generate"), encoding="utf-8") as f:
         content = f.read()
