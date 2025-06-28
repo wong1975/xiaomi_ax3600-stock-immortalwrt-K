@@ -1,4 +1,4 @@
-name: OpenWrt-K Config Build
+name: OpenWrt-K Config 配置设置
 
 on:
   #push:
